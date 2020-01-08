@@ -42,13 +42,6 @@ const playlistTracksQuery = gql`
                 track_number
                 type
                 uri
-                artists {
-                    href
-                    id
-                    name
-                    type
-                    uri
-                }
                 album {
                     album_type
                     href
@@ -59,6 +52,13 @@ const playlistTracksQuery = gql`
                     total_tracks
                     type
                     uri
+                    artists {
+                        href
+                        id
+                        name
+                        type
+                        uri
+                    }
                     images {
                         height
                         width
@@ -69,34 +69,37 @@ const playlistTracksQuery = gql`
         }
     }`;
 
+// uses a local state to reduce calls to the server anytime the playlist is updated
 function playlist() {
-    const [tracks, setTracks] = useState([]);
     const [albums, setAlbums] = useState([]);
-    const [albumTracks, setAlbumTracks] = useState([]);
-    const [fetchingTracks, setFetchingTracks] = useState(false);
+    const [albumTracks, setAlbumTracks] = useState({});
+    const [localLoading, setLocalLoading] = useState(false);
     const { loading, requestedTracks, removeUserRequestedTrack } = useContext(RequestedTracksContext);
 
-    const getTracksVars = useQuery(
+    const [getTracks, getTracksVars] = useLazyQuery(
         playlistTracksQuery,
         {
-            variables: { ids: _.map(requestedTracks, "trackId") },
+            //variables: { ids: _.values(albumTracks) > 0 ? _.filter(_.map(requestedTracks, "trackId"), id => !_.includes(_.map(_.flatten(_.values(albumTracks)), "id"), id)) : _.map(requestedTracks, "trackId") },
             fetchPolicy: "no-cache",
             onCompleted: data => {
                 if (!data.getTracks) return;
+                
                 var tracks = _.cloneDeep(data.getTracks.data);
-                if (!tracks) return;
+
+                if (_.isUndefined(tracks) || _.isNull(tracks) || _.isNaN(tracks)) return;
+                if (_.values(tracks) <= 0) return;
 
                 tracks = _.orderBy(tracks, ["track_number"], ["asc"]);
 
-
                 var fetchedAlbumTracks = {};
-
+                _.assign(fetchedAlbumTracks, _.cloneDeep(albumTracks));
+                
                 _.map(tracks, trackItem => {
                     fetchedAlbumTracks[trackItem.album.id] = fetchedAlbumTracks[trackItem.album.id] || []
                     fetchedAlbumTracks[trackItem.album.id].push(_.pull(trackItem, "artists", "album"))
                 });
 
-                setAlbums(_.uniqBy(_.orderBy(_.map(tracks, "album"), ["name", "id"], ["asc", "asc"]), "id"));
+                setAlbums(_.uniqBy(_.orderBy(_.concat( _.cloneDeep(albums), _.map(tracks, "album")), ["name", "id"], ["asc", "asc"]), "id"));
                 setAlbumTracks(fetchedAlbumTracks);
             },
             onError: error => {
@@ -109,7 +112,6 @@ function playlist() {
         e.preventDefault();
         if (!e.target.value) return;
 
-
         message.loading('Removing from playlist', 1.2).then(() =>
             removeUserRequestedTrack({
                 variables: {
@@ -121,43 +123,64 @@ function playlist() {
         );
     }
 
-    const setPlaylistData = () => {
-        if (requestedTracks.length <= 0) return;
+    const syncAddedTracks = () => {
+        var existingIds = _.map(_.flatten(_.values(albumTracks)), "id");
+        var contextIds = _.map(requestedTracks, "trackId"); 
 
-        const savedTracks = _.map(requestedTracks, "trackId");
-
-        var tracks = _.orderBy(_.filter(albumTracks, track => _.includes(savedTracks, track.id)), ["track_number"], ["asc"]);
-
-        setAlbums(_.uniqBy(_.orderBy(_.map(tracks, "album"), ["name", "id"], ["asc", "asc"]), "id"));
-
-        var fetchedAlbumTracks = {};
-        //var existingAlbumTracks = _.cloneDeep(albumTracks);
-        //_.assign(fetchedAlbumTracks, existingAlbumTracks);
-
-        _.map(tracks, trackItem => {
-            fetchedAlbumTracks[trackItem.album.id] = fetchedAlbumTracks[trackItem.album.id] || []
-            fetchedAlbumTracks[trackItem.album.id].push(_.pull(trackItem, "artists", "album"))
-        });
-
-        setAlbumTracks(fetchedAlbumTracks)
+        if(contextIds.length > existingIds.length) {
+            var missingIds = _.filter(_.map(requestedTracks, "trackId"), id => !_.includes(_.map(_.flatten(_.values(albumTracks)), "id"), id))
+            getTracks({variables: { ids: missingIds }})
+        }
     }
 
-    const getPlaylistTracks = () => {
-        setFetchingTracks(true);
-        //getTracks({ variables: { ids: _.map(requestedTracks, "trackId") } })
+    const syncRemovedTracks = () => {
+        var existingIds = _.map(_.flatten(_.values(albumTracks)), "id");
+        var contextIds = _.map(requestedTracks, "trackId");
+
+        if(contextIds.length < existingIds.length) {
+            var removedIds = _.filter(_.map(_.flatten(_.values(albumTracks)), "id"), id => !_.includes(_.map(requestedTracks, "trackId"), id));
+
+            var existingAlbums = _.cloneDeep(albums);
+            var existingAlbumTracks = _.cloneDeep(albumTracks);
+            
+            _.map(_.keys(existingAlbumTracks), albumId => {
+                var tracks = existingAlbumTracks[albumId];
+                _.remove(tracks, track => _.includes(removedIds, track.id))
+
+                tracks.length > 0 ? existingAlbumTracks[albumId] = tracks : delete existingAlbumTracks[albumId];
+
+                // if album has no tracks then remove album state
+                !_.hasIn(existingAlbumTracks, albumId) ? _.remove(existingAlbums, album => album.id === albumId) : null;
+            });
+
+            !_.isEqual(albums, existingAlbums) ? setAlbums(existingAlbums) : null;
+            !_.isEqual(albumTracks, existingAlbumTracks) ? setAlbumTracks(existingAlbumTracks) : null;
+        }
     }
 
-    //useEffect(getPlaylistTracks, [requestedTracks]);
-    //useEffect(setPlaylistData, [requestedTracks]);
+    useEffect(() => { 
+        setLocalLoading(true);
+        setTimeout(() => {
+            syncAddedTracks();
+            setLocalLoading(false);
+        }, 200);
+    }, [requestedTracks]);
+
+    useEffect(() => { 
+        setLocalLoading(true);
+        setTimeout(() => {
+            syncRemovedTracks();
+            setLocalLoading(false);
+        }, 200);
+    }, [requestedTracks]);
 
 
     return (
         <Card
-            //loading={loading || getTracksVars.loading}
             className="album-view-card"
             bordered={false}
             cover={
-                requestedTracks.length > 0
+                _.values(requestedTracks).length > 0
                     ? <div className="great-scott">
                         <img src={bgImage} alt="bg" style={{ width: "55%" }} />
                         <div className="great-scott-title" >Great Scott!</div>
@@ -170,24 +193,21 @@ function playlist() {
                     </div>
             }
         >
-            <Card.Meta
-                title={""}
-            />
+            <Card.Meta title={""} />
             <List
                 itemLayout="horizontal"
-                loading={loading || getTracksVars.loading}
+                loading={loading || getTracksVars.loading || localLoading}
                 dataSource={albums ? albums : []}
                 renderItem={item => (
                     <Collapse
                         bordered={false}
                         expandIconPosition="right"
                         defaultActiveKey={_.map(albums, "id")}
-                    //onChange={onCollapseItem}
                     >
                         <Collapse.Panel
                             key={item.id}
                             header={
-                                <List.Item key={item.id} rowKey={item.id}>
+                                <List.Item key={item.id}>
                                     <div className="artist-album-item">
                                         <List.Item.Meta
                                             title={item.name}
@@ -201,29 +221,26 @@ function playlist() {
                                         />
                                     </div>
                                 </List.Item>}>
-                            <List
-                                itemLayout="horizontal"
-                                loading={loading || getTracksVars.loading}
-                            >
+                            <List itemLayout="horizontal" split={false}>
                                 {_.map(albumTracks ? albumTracks[item.id] : [], item => 
                                     // inline map fixes issue with sub-elements not being removed upon removal from albumTracks state
-                                    <List.Item key={item.id} rowKey={item.id}>
+                                    <List.Item key={item.id}>
                                         <Row gutter={2} justify="space-between" style={{ width: "100%" }}>
                                             <Col span={2}>
                                                 <Checkbox
                                                     value={item.id}
                                                     onChange={handleSelectedTrack}
                                                     defaultChecked={getTracksVars.data
-                                                        ? _.findIndex(_.flatten(_.values(requestedTracks)), { "trackId": item.id }) >= 0
+                                                        ? _.findIndex(requestedTracks, { "trackId": item.id }) >= 0
                                                         : false}
                                                 />
                                             </Col>
 
                                             <Col span={15}>
-                                                {item.track_number + " - " + item.name}
+                                                {item.name}
                                             </Col>
 
-                                            <Col span={4}>
+                                            <Col span={4} style={{paddingLeft:4}}>
                                                 {msToTime(item.duration_ms)}
                                             </Col>
 

@@ -31,7 +31,9 @@ function album() {
     //const searchResultContext = useContext(SearchResultContext);
     const [selectedAlbumId, setSelectedAlbumId] = useState(id);
     const [albumTracks, setAlbumTracks] = useState({});
-
+    const [localLoading, setLocalLoading] = useState(false);
+    const {loading, requestedTracks, insertUserRequestedTrack, removeUserRequestedTrack} = useContext(RequestedTracksContext);
+    
     const getAlbum = useQuery(
         gql`
         query GetAlbumById($id: String!) {
@@ -152,9 +154,6 @@ function album() {
         }
     )
 
-
-    const {loading, requestedTracks, insertUserRequestedTrack, removeUserRequestedTrack} = useContext(RequestedTracksContext);
-
     const handleSelectedTrack = (e) => {
         e.preventDefault();
         if(!e.target.value) return;
@@ -182,11 +181,11 @@ function album() {
             );
         }
     }
-    
+
     return (
         <div>
             <Card
-                loading={getAlbum.loading}
+                //loading={getAlbum.loading}
                 className="album-view-card"
                 bordered={false}
                 cover={

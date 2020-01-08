@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import ls from 'local-storage'
 import { gql } from "apollo-boost";
 import { useQuery, useLazyQuery } from "@apollo/react-hooks";
@@ -25,12 +25,13 @@ function msToTime(duration) {
 }
 
 function artist() {
+    const router = useRouter();
+    const { id } = router.query;
     //const searchResultContext = useContext(SearchResultContext);
     const [selectedAlbumId, setSelectedAlbumId] = useState();
     const [albumTracks, setAlbumTracks] = useState({});
-    const router = useRouter();
-    const { id } = router.query;
-
+    const [localLoading, setLocalLoading] = useState(false);
+    const { loading, requestedTracks, insertUserRequestedTrack, removeUserRequestedTrack } = useContext(RequestedTracksContext);
 
     const getArtist = useQuery(
         gql`
@@ -184,8 +185,6 @@ function artist() {
         }, 400)
     }
 
-    const { loading, requestedTracks, insertUserRequestedTrack, removeUserRequestedTrack } = useContext(RequestedTracksContext);
-
     const handleSelectedTrack = (e) => {
         e.preventDefault();
         if (!e.target.value) return;
@@ -217,7 +216,7 @@ function artist() {
     return (
         <div>
             <Card
-                loading={getArtist.loading}
+                //loading={getArtist.loading}
                 className="artist-view-card"
                 bordered={false}
                 cover={
@@ -242,7 +241,7 @@ function artist() {
                 />
                 <List
                     itemLayout="horizontal"
-                    loading={getArtistAlbumsVars.loading}
+                    loading={getArtistAlbumsVars.loading || localLoading}
                     dataSource={getArtistAlbumsVars.data ? getArtistAlbumsVars.data.getArtistAlbums.data.items : []}
                     renderItem={item => (
                         <Collapse
@@ -269,29 +268,28 @@ function artist() {
                                     </List.Item>}>
                                 <List
                                     itemLayout="horizontal"
-                                    loading={getAlbumTracksVars.loading}
+                                    loading={getAlbumTracksVars.loading || localLoading}
                                     dataSource={albumTracks ? albumTracks[item.id] : []}
-                                    renderItem={item => (
-                                        <List.Item key={item.id}>
-                                            <Row gutter={2} justify="space-between" style={{ width: "100%" }}>
-                                                <Col span={2}>
-                                                    <Checkbox value={item.id} onChange={handleSelectedTrack} defaultChecked={_.findIndex(requestedTracks, { "trackId": item.id }) >= 0} />
-                                                </Col>
+                                    renderItem={track => 
+                                        <List.Item key={track.id}>
+                                        <Row gutter={2} justify="space-between" style={{ width: "100%" }}>
+                                            <Col span={2}>
+                                                <Checkbox value={track.id} onChange={handleSelectedTrack} defaultChecked={_.findIndex(requestedTracks, { "trackId": track.id }) >= 0} />
+                                            </Col>
 
-                                                <Col span={15}>
-                                                    {item.name}
-                                                </Col>
+                                            <Col span={15}>
+                                                {track.name}
+                                            </Col>
 
-                                                <Col span={4}>
-                                                    {msToTime(item.duration_ms)}
-                                                </Col>
+                                            <Col span={4}>
+                                                {msToTime(track.duration_ms)}
+                                            </Col>
 
-                                                <Col span={3}>
-                                                    <AudioControlButton size="small" disabled={!item.preview_url} audioId={item.id + "-audio"} src={item.preview_url} />
-                                                </Col>
-                                            </Row>
-                                        </List.Item>
-                                    )}
+                                            <Col span={3}>
+                                                <AudioControlButton size="small" disabled={!track.preview_url} audioId={track.id + "-audio"} src={track.preview_url} />
+                                            </Col>
+                                        </Row>
+                                    </List.Item>}
                                 />
 
                             </Collapse.Panel>

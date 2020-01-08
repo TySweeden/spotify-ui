@@ -17,10 +17,11 @@ import {
     Layout,
     Menu,
     Icon,
-    Spin
+    Spin,
+    BackTop
 } from 'antd';
 import { useState, useEffect } from "react";
-
+import { useRouter } from 'next/router'
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -56,6 +57,7 @@ const determinePageSize = (height, width) => {
 
 function InitApp(props) {
     const { Component, pageProps } = props;
+    const router = useRouter()
     const [pageSize, setPageSize] = useState();
     const [clientIdentifier, setClientIdentifier] = useState();
     const [configuration, setConfiguration] = useState();
@@ -73,7 +75,7 @@ function InitApp(props) {
     const getClientIdentifier = () => {
         var uuid = ls.get('client-identifier');
 
-        if(_.isUndefined(uuid) || _.isNull(uuid) || _.isNaN(uuid)) {
+        if (_.isUndefined(uuid) || _.isNull(uuid) || _.isNaN(uuid)) {
             ls.set('client-identifier', uuidv1());
             uuid = ls.get('client-identifier');
         }
@@ -153,6 +155,8 @@ function InitApp(props) {
 
     return (
         <Spin size="large" className="main-spinner" spinning={!configuration || !apolloClient}>
+
+        <BackTop />
             {!configuration || !apolloClient ? <span style={{ position: "fixed", right: 6, bottom: 6, fontWeight: 600 }}>CONNECTING...</span> :
                 <ConfigContext.Provider value={{ clientIdentifier, configuration, pageAttributes: { pageSize } }}>
                     <ApolloProvider client={apolloClient}>
@@ -177,7 +181,20 @@ function InitApp(props) {
 
 
                             <div className="main-nav-menu">
-                                <Menu size="small" mode="horizontal" defaultSelectedKeys={['2']} subMenuCloseDelay={1} subMenuOpenDelay={1}>
+                                <Menu 
+                                    size="small" 
+                                    mode="horizontal" 
+                                    defaultSelectedKeys={
+                                        router.pathname === "/"
+                                        ? ['1']
+                                        : _.includes(router.pathname, "/search") 
+                                            ? ['2']
+                                            : _.includes(router.pathname, "/playlist") 
+                                                ? ['3']
+                                                : ['2']
+                                    } 
+                                    subMenuCloseDelay={1} 
+                                    subMenuOpenDelay={1}>
                                     <Menu.Item key="1">
                                         <Link href="/">
                                             <span>
@@ -197,19 +214,19 @@ function InitApp(props) {
                                     </Menu.Item>
 
                                     <Menu.Item key="3">
-                                    <Link href="/view/playlist">
-                                        <span>
-                                            <Icon type="smile" style={{ fontSize: "1.4em" }} />
-                                            <span>Playlist</span>
-                                        </span>
-                                    </Link>
-                                </Menu.Item>
+                                        <Link href="/view/playlist">
+                                            <span>
+                                                <Icon type="smile" style={{ fontSize: "1.4em" }} />
+                                                <span>Playlist</span>
+                                            </span>
+                                        </Link>
+                                    </Menu.Item>
                                 </Menu>
                             </div>
 
                             <Footer style={{ position: "absolute", bottom: 0, left: 0, right: 0 }} >
-                                 <div style={{ float:"right" }}>
-                                    <Icon component={reactIcon} /> 
+                                <div style={{ float: "right" }}>
+                                    <Icon component={reactIcon} />
                                     <Icon component={graphqlIcon} />
                                     <Icon component={spotifyIcon} />
                                 </div>

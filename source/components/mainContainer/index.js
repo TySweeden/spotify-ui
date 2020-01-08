@@ -168,7 +168,7 @@ function MainContainer(props) {
     {
       onSubscriptionData: data => {
         console.log(data.subscriptionData);
-        message.success('Playlist updated', 2);
+        message.success('Playlist updated', 1.5);
       },
       onError: error => {
         console.log(error);
@@ -210,7 +210,7 @@ function MainContainer(props) {
       onCompleted: data => {
         if (!data.insert_userRequestPlaylistTracks) return;
         
-        message.success('Saved to playlist', 2);
+        message.success('Saved to playlist', 1.2);
         //console.log(_.first(data.insert_userRequestPlaylistTracks));
       },
       onError: error => {
@@ -246,7 +246,7 @@ function MainContainer(props) {
       onCompleted: data => {
         if (!data.delete_userRequestPlaylistTracks) return;
         
-        message.success('Removed from playlist', 2);
+        message.success('Removed from playlist', 1.2);
         //console.log(_.first(data.delete_userRequestPlaylistTracks));
       },
       onError: error => {
