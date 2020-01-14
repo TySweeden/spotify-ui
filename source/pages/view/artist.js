@@ -214,90 +214,99 @@ function artist() {
     }
 
     return (
-        <div>
-            <Card
-                //loading={getArtist.loading}
-                className="artist-view-card"
-                bordered={false}
-                cover={
-                    getArtist.data
-                        ? _.has(getArtist.data.getArtistById.data, "images")
-                            ? <img src={_.get(_.head(_.get(getArtist.data.getArtistById.data, "images")), "url")} />
-                            : <Avatar size={411} shape="square" icon="user" />
-                        : <Avatar size={411} shape="square" icon="user" />
-                }
+        <Row gutter={16} layout="flex" justify="space-between" style={{ zIndex: 1 }}>
+            <Col
+                xs={{ span: 24 }}
+                sm={{ span: 24 }}
+                md={{ span: 24 }}
+                lg={{ span: 14 }}
+                xl={{ span: 14 }}
+                xxl={{ span: 10 }}
             >
-                <Card.Meta
-                    title={
+                <Card
+                    //loading={getArtist.loading}
+                    className="artist-view-card"
+                    bordered={false}
+                    cover={
                         getArtist.data
-                            ? _.get(getArtist.data.getArtistById.data, "name")
-                            : null}
-                    description={
-                        getArtist.data
-                            ? _.has(getArtist.data.getArtistById.data, "genres")
-                                ? _.join(getArtist.data.getArtistById.data.genres, " • ")
-                                : null
-                            : null}
-                />
-                <List
-                    itemLayout="horizontal"
-                    loading={getArtistAlbumsVars.loading || localLoading}
-                    dataSource={getArtistAlbumsVars.data ? getArtistAlbumsVars.data.getArtistAlbums.data.items : []}
-                    renderItem={item => (
-                        <Collapse
-                            bordered={false}
-                            expandIconPosition="right"
-                            onChange={onCollapseItem}
-                        >
-                            <Collapse.Panel
-                                key={item.id}
-                                header={
-                                    <List.Item key={item.id}>
-                                        <div className="artist-album-item">
-                                            <List.Item.Meta
-                                                title={item.name}
-                                                avatar={_.get(_.head(item.images), "url")
-                                                    ? <Avatar size={80} shape="square" src={_.get(_.head(item.images), "url")} />
-                                                    : <Avatar size={80} shape="square" icon="user" />}
-                                                description={
-                                                    item.type === "album" && _.get(item, "artists")
-                                                        ? item.type + " • " + _.join(_.map(item.artists, "name"), " • ")
-                                                        : item.type}
-                                            />
-                                        </div>
-                                    </List.Item>}>
-                                <List
-                                    itemLayout="horizontal"
-                                    loading={getAlbumTracksVars.loading || localLoading}
-                                    dataSource={albumTracks ? albumTracks[item.id] : []}
-                                    renderItem={track => 
-                                        <List.Item key={track.id}>
-                                        <Row gutter={2} justify="space-between" style={{ width: "100%" }}>
-                                            <Col span={2}>
-                                                <Checkbox value={track.id} onChange={handleSelectedTrack} defaultChecked={_.findIndex(requestedTracks, { "trackId": track.id }) >= 0} />
-                                            </Col>
+                            ? _.has(getArtist.data.getArtistById.data, "images")
+                                ? <img src={_.get(_.head(_.get(getArtist.data.getArtistById.data, "images")), "url")} />
+                                : <Avatar size={411} shape="square" icon="user" />
+                            : <Avatar size={411} shape="square" icon="user" />
+                    }
+                >
+                    <Card.Meta
+                        title={
+                            getArtist.data
+                                ? _.get(getArtist.data.getArtistById.data, "name")
+                                : null}
+                        description={
+                            getArtist.data
+                                ? _.has(getArtist.data.getArtistById.data, "genres")
+                                    ? _.join(getArtist.data.getArtistById.data.genres, " • ")
+                                    : null
+                                : null}
+                    />
+                    <List
+                        itemLayout="horizontal"
+                        loading={getArtistAlbumsVars.loading || localLoading}
+                        dataSource={getArtistAlbumsVars.data ? getArtistAlbumsVars.data.getArtistAlbums.data.items : []}
+                        renderItem={item => (
+                            <Collapse
+                                bordered={false}
+                                expandIconPosition="right"
+                                onChange={onCollapseItem}
+                            >
+                                <Collapse.Panel
+                                    key={item.id}
+                                    header={
+                                        <List.Item key={item.id}>
+                                            <div className="artist-album-item">
+                                                <List.Item.Meta
+                                                    title={item.name}
+                                                    avatar={_.get(_.head(item.images), "url")
+                                                        ? <Avatar size={80} shape="square" src={_.get(_.head(item.images), "url")} />
+                                                        : <Avatar size={80} shape="square" icon="user" />}
+                                                    description={
+                                                        item.type === "album" && _.get(item, "artists")
+                                                            ? item.type + " • " + _.join(_.map(item.artists, "name"), " • ")
+                                                            : item.type}
+                                                />
+                                            </div>
+                                        </List.Item>}>
+                                    <List
+                                        itemLayout="horizontal"
+                                        loading={getAlbumTracksVars.loading || localLoading}
+                                        dataSource={albumTracks ? albumTracks[item.id] : []}
+                                        renderItem={track =>
+                                            <List.Item key={track.id}>
+                                                <Row gutter={2} justify="space-between" style={{ width: "100%" }}>
+                                                    <Col span={2}>
+                                                        <Checkbox value={track.id} onChange={handleSelectedTrack} defaultChecked={_.findIndex(requestedTracks, { "trackId": track.id }) >= 0} />
+                                                    </Col>
 
-                                            <Col span={15}>
-                                                {track.name}
-                                            </Col>
+                                                    <Col span={15}>
+                                                        {track.name}
+                                                    </Col>
 
-                                            <Col span={4}>
-                                                {msToTime(track.duration_ms)}
-                                            </Col>
+                                                    <Col span={4}>
+                                                        {msToTime(track.duration_ms)}
+                                                    </Col>
 
-                                            <Col span={3}>
-                                                <AudioControlButton size="small" disabled={!track.preview_url} audioId={track.id + "-audio"} src={track.preview_url} />
-                                            </Col>
-                                        </Row>
-                                    </List.Item>}
-                                />
+                                                    <Col span={3}>
+                                                        <AudioControlButton size="small" disabled={!track.preview_url} audioId={track.id + "-audio"} src={track.preview_url} />
+                                                    </Col>
+                                                </Row>
+                                            </List.Item>}
+                                    />
 
-                            </Collapse.Panel>
-                        </Collapse>
-                    )}
-                />
-            </Card>
-        </div>
+                                </Collapse.Panel>
+                            </Collapse>
+                        )}
+                    />
+                </Card>
+            </Col>
+        </Row>
     );
 }
 

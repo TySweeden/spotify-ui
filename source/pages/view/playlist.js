@@ -83,7 +83,7 @@ function playlist() {
             fetchPolicy: "no-cache",
             onCompleted: data => {
                 if (!data.getTracks) return;
-                
+
                 var tracks = _.cloneDeep(data.getTracks.data);
 
                 if (_.isUndefined(tracks) || _.isNull(tracks) || _.isNaN(tracks)) return;
@@ -93,13 +93,13 @@ function playlist() {
 
                 var fetchedAlbumTracks = {};
                 _.assign(fetchedAlbumTracks, _.cloneDeep(albumTracks));
-                
+
                 _.map(tracks, trackItem => {
                     fetchedAlbumTracks[trackItem.album.id] = fetchedAlbumTracks[trackItem.album.id] || []
                     fetchedAlbumTracks[trackItem.album.id].push(_.pull(trackItem, "artists", "album"))
                 });
 
-                setAlbums(_.uniqBy(_.orderBy(_.concat( _.cloneDeep(albums), _.map(tracks, "album")), ["name", "id"], ["asc", "asc"]), "id"));
+                setAlbums(_.uniqBy(_.orderBy(_.concat(_.cloneDeep(albums), _.map(tracks, "album")), ["name", "id"], ["asc", "asc"]), "id"));
                 setAlbumTracks(fetchedAlbumTracks);
             },
             onError: error => {
@@ -125,11 +125,11 @@ function playlist() {
 
     const syncAddedTracks = () => {
         var existingIds = _.map(_.flatten(_.values(albumTracks)), "id");
-        var contextIds = _.map(requestedTracks, "trackId"); 
+        var contextIds = _.map(requestedTracks, "trackId");
 
-        if(contextIds.length > existingIds.length) {
+        if (contextIds.length > existingIds.length) {
             var missingIds = _.filter(_.map(requestedTracks, "trackId"), id => !_.includes(_.map(_.flatten(_.values(albumTracks)), "id"), id))
-            getTracks({variables: { ids: missingIds }})
+            getTracks({ variables: { ids: missingIds } })
         }
     }
 
@@ -137,12 +137,12 @@ function playlist() {
         var existingIds = _.map(_.flatten(_.values(albumTracks)), "id");
         var contextIds = _.map(requestedTracks, "trackId");
 
-        if(contextIds.length < existingIds.length) {
+        if (contextIds.length < existingIds.length) {
             var removedIds = _.filter(_.map(_.flatten(_.values(albumTracks)), "id"), id => !_.includes(_.map(requestedTracks, "trackId"), id));
 
             var existingAlbums = _.cloneDeep(albums);
             var existingAlbumTracks = _.cloneDeep(albumTracks);
-            
+
             _.map(_.keys(existingAlbumTracks), albumId => {
                 var tracks = existingAlbumTracks[albumId];
                 _.remove(tracks, track => _.includes(removedIds, track.id))
@@ -158,7 +158,7 @@ function playlist() {
         }
     }
 
-    useEffect(() => { 
+    useEffect(() => {
         setLocalLoading(true);
         setTimeout(() => {
             syncAddedTracks();
@@ -166,7 +166,7 @@ function playlist() {
         }, 200);
     }, [requestedTracks]);
 
-    useEffect(() => { 
+    useEffect(() => {
         setLocalLoading(true);
         setTimeout(() => {
             syncRemovedTracks();
@@ -176,88 +176,99 @@ function playlist() {
 
 
     return (
-        <Card
-            className="album-view-card"
-            bordered={false}
-            cover={
-                _.values(requestedTracks).length > 0
-                    ? <div className="great-scott">
-                        <img src={bgImage} alt="bg" style={{ width: "55%" }} />
-                        <div className="great-scott-title" >Great Scott!</div>
-                        <div className="great-scott-description">Your playlist is amazing!</div>
-                    </div>
-                    : <div className="great-scott">
-                        <img src={bgImage} alt="bg" style={{ width: "55%" }} />
-                        <div className="great-scott-title">Great Scott!</div>
-                        <div className="great-scott-description">Your playlist is empty!</div>
-                    </div>
-            }
-        >
-            <Card.Meta title={""} />
-            <List
-                itemLayout="horizontal"
-                loading={loading || getTracksVars.loading || localLoading}
-                dataSource={albums ? albums : []}
-                renderItem={item => (
-                    <Collapse
-                        bordered={false}
-                        expandIconPosition="right"
-                        defaultActiveKey={_.map(albums, "id")}
-                    >
-                        <Collapse.Panel
-                            key={item.id}
-                            header={
-                                <List.Item key={item.id}>
-                                    <div className="artist-album-item">
-                                        <List.Item.Meta
-                                            title={item.name}
-                                            avatar={_.get(_.head(item.images), "url")
-                                                ? <Avatar size={80} shape="square" src={_.get(_.head(item.images), "url")} />
-                                                : <Avatar size={80} shape="square" icon="user" />}
-                                            description={
-                                                item.type === "album" && _.get(item, "artists")
-                                                    ? item.type + " • " + _.join(_.map(item.artists, "name"), " • ")
-                                                    : item.type}
-                                        />
-                                    </div>
-                                </List.Item>}>
-                            <List itemLayout="horizontal" split={false}>
-                                {_.map(albumTracks ? albumTracks[item.id] : [], item => 
-                                    // inline map fixes issue with sub-elements not being removed upon removal from albumTracks state
-                                    <List.Item key={item.id}>
-                                        <Row gutter={2} justify="space-between" style={{ width: "100%" }}>
-                                            <Col span={2}>
-                                                <Checkbox
-                                                    value={item.id}
-                                                    onChange={handleSelectedTrack}
-                                                    defaultChecked={getTracksVars.data
-                                                        ? _.findIndex(requestedTracks, { "trackId": item.id }) >= 0
-                                                        : false}
+        <Row gutter={16} layout="flex" justify="space-between" style={{ zIndex: 1 }}>
+            <Col
+                xs={{ span: 24 }}
+                sm={{ span: 24 }}
+                md={{ span: 24 }}
+                lg={{ span: 14 }}
+                xl={{ span: 14 }}
+                xxl={{ span: 10 }}
+            >
+                <Card
+                    className="album-view-card"
+                    bordered={false}
+                    cover={
+                        _.values(requestedTracks).length > 0
+                            ? <div className="great-scott">
+                                <img src={bgImage} alt="bg" style={{ width: "55%" }} />
+                                <div className="great-scott-title" >Great Scott!</div>
+                                <div className="great-scott-description">Your playlist is amazing!</div>
+                            </div>
+                            : <div className="great-scott">
+                                <img src={bgImage} alt="bg" style={{ width: "55%" }} />
+                                <div className="great-scott-title">Great Scott!</div>
+                                <div className="great-scott-description">Your playlist is empty!</div>
+                            </div>
+                    }
+                >
+                    <Card.Meta title={""} />
+                    <List
+                        itemLayout="horizontal"
+                        loading={loading || getTracksVars.loading || localLoading}
+                        dataSource={albums ? albums : []}
+                        renderItem={item => (
+                            <Collapse
+                                bordered={false}
+                                expandIconPosition="right"
+                                defaultActiveKey={_.map(albums, "id")}
+                            >
+                                <Collapse.Panel
+                                    key={item.id}
+                                    header={
+                                        <List.Item key={item.id}>
+                                            <div className="artist-album-item">
+                                                <List.Item.Meta
+                                                    title={item.name}
+                                                    avatar={_.get(_.head(item.images), "url")
+                                                        ? <Avatar size={80} shape="square" src={_.get(_.head(item.images), "url")} />
+                                                        : <Avatar size={80} shape="square" icon="user" />}
+                                                    description={
+                                                        item.type === "album" && _.get(item, "artists")
+                                                            ? item.type + " • " + _.join(_.map(item.artists, "name"), " • ")
+                                                            : item.type}
                                                 />
-                                            </Col>
+                                            </div>
+                                        </List.Item>}>
+                                    <List itemLayout="horizontal" split={false}>
+                                        {_.map(albumTracks ? albumTracks[item.id] : [], item =>
+                                            // inline map fixes issue with sub-elements not being removed upon removal from albumTracks state
+                                            <List.Item key={item.id}>
+                                                <Row gutter={2} justify="space-between" style={{ width: "100%" }}>
+                                                    <Col span={2}>
+                                                        <Checkbox
+                                                            value={item.id}
+                                                            onChange={handleSelectedTrack}
+                                                            defaultChecked={getTracksVars.data
+                                                                ? _.findIndex(requestedTracks, { "trackId": item.id }) >= 0
+                                                                : false}
+                                                        />
+                                                    </Col>
 
-                                            <Col span={15}>
-                                                {item.name}
-                                            </Col>
+                                                    <Col span={15}>
+                                                        {item.name}
+                                                    </Col>
 
-                                            <Col span={4} style={{paddingLeft:4}}>
-                                                {msToTime(item.duration_ms)}
-                                            </Col>
+                                                    <Col span={4} style={{ paddingLeft: 4 }}>
+                                                        {msToTime(item.duration_ms)}
+                                                    </Col>
 
-                                            <Col span={3}>
-                                                <AudioControlButton size="small" disabled={!item.preview_url} audioId={item.id + "-audio"} src={item.preview_url} />
-                                            </Col>
-                                        </Row>
-                                    </List.Item>
-                                )}
+                                                    <Col span={3}>
+                                                        <AudioControlButton size="small" disabled={!item.preview_url} audioId={item.id + "-audio"} src={item.preview_url} />
+                                                    </Col>
+                                                </Row>
+                                            </List.Item>
+                                        )}
 
-                            </List>
+                                    </List>
 
-                        </Collapse.Panel>
-                    </Collapse>
-                )}
-            />
-        </Card>
+                                </Collapse.Panel>
+                            </Collapse>
+                        )}
+                    />
+                </Card>
+            </Col>
+        </Row>
     )
 }
 

@@ -32,8 +32,8 @@ function album() {
     const [selectedAlbumId, setSelectedAlbumId] = useState(id);
     const [albumTracks, setAlbumTracks] = useState({});
     const [localLoading, setLocalLoading] = useState(false);
-    const {loading, requestedTracks, insertUserRequestedTrack, removeUserRequestedTrack} = useContext(RequestedTracksContext);
-    
+    const { loading, requestedTracks, insertUserRequestedTrack, removeUserRequestedTrack } = useContext(RequestedTracksContext);
+
     const getAlbum = useQuery(
         gql`
         query GetAlbumById($id: String!) {
@@ -156,23 +156,23 @@ function album() {
 
     const handleSelectedTrack = (e) => {
         e.preventDefault();
-        if(!e.target.value) return;
+        if (!e.target.value) return;
 
-        if(e.target.checked) {
+        if (e.target.checked) {
             message.loading('Saving to playlist', 1.2).then(() =>
                 insertUserRequestedTrack({
-                    variables:{
+                    variables: {
                         trackId: e.target.value,
                         userId: ls.get("client-identifier"),
                         partyId: "somePartyId"
                     }
                 })
             );
-            
+
         } else {
-            message.loading('Removing from playlist', 1.2).then(() => 
+            message.loading('Removing from playlist', 1.2).then(() =>
                 removeUserRequestedTrack({
-                    variables:{
+                    variables: {
                         trackId: e.target.value,
                         userId: ls.get("client-identifier"),
                         partyId: "somePartyId"
@@ -183,60 +183,69 @@ function album() {
     }
 
     return (
-        <div>
-            <Card
-                //loading={getAlbum.loading}
-                className="album-view-card"
-                bordered={false}
-                cover={
-                    getAlbum.data
-                        ? _.has(getAlbum.data.getAlbumById.data, "images")
-                            ? <img src={_.get(_.head(_.get(getAlbum.data.getAlbumById.data, "images")), "url")} />
-                            : <Avatar size={411} shape="square" icon="user" />
-                        : <Avatar size={411} shape="square" icon="user" />
-                }
+        <Row gutter={16} layout="flex" justify="space-between" style={{ zIndex: 1 }}>
+            <Col
+                xs={{ span: 24 }}
+                sm={{ span: 24 }}
+                md={{ span: 24 }}
+                lg={{ span: 14 }}
+                xl={{ span: 14 }}
+                xxl={{ span: 10 }}
             >
-                <Card.Meta
-                    title={
+                <Card
+                    //loading={getAlbum.loading}
+                    className="album-view-card"
+                    bordered={false}
+                    cover={
                         getAlbum.data
-                            ? _.get(getAlbum.data.getAlbumById.data, "name")
-                            : null}
-                    description={
-                        getAlbum.data
-                            ? _.has(getAlbum.data.getAlbumById.data, "genres")
-                                ? _.join(getAlbum.data.getAlbumById.data, " • ")
-                                : null
-                            : null}
-                />
+                            ? _.has(getAlbum.data.getAlbumById.data, "images")
+                                ? <img src={_.get(_.head(_.get(getAlbum.data.getAlbumById.data, "images")), "url")} />
+                                : <Avatar size={411} shape="square" icon="user" />
+                            : <Avatar size={411} shape="square" icon="user" />
+                    }
+                >
+                    <Card.Meta
+                        title={
+                            getAlbum.data
+                                ? _.get(getAlbum.data.getAlbumById.data, "name")
+                                : null}
+                        description={
+                            getAlbum.data
+                                ? _.has(getAlbum.data.getAlbumById.data, "genres")
+                                    ? _.join(getAlbum.data.getAlbumById.data, " • ")
+                                    : null
+                                : null}
+                    />
 
-                <List
-                    itemLayout="horizontal"
-                    loading={getAlbumTracksVars.loading}
-                    dataSource={albumTracks ? albumTracks[selectedAlbumId] : []}
-                    renderItem={item => (
-                        <List.Item key={item.id} id={item.id}>
-                            <Row gutter={2} justify="space-between" style={{ width: "100%" }}>
-                                <Col span={2}>
-                                    <Checkbox value={item.id} onChange={handleSelectedTrack} defaultChecked={_.findIndex(requestedTracks, {"trackId":item.id}) >= 0}/>
-                                </Col>
+                    <List
+                        itemLayout="horizontal"
+                        loading={getAlbumTracksVars.loading}
+                        dataSource={albumTracks ? albumTracks[selectedAlbumId] : []}
+                        renderItem={item => (
+                            <List.Item key={item.id} id={item.id}>
+                                <Row gutter={2} justify="space-between" style={{ width: "100%" }}>
+                                    <Col span={2}>
+                                        <Checkbox value={item.id} onChange={handleSelectedTrack} defaultChecked={_.findIndex(requestedTracks, { "trackId": item.id }) >= 0} />
+                                    </Col>
 
-                                <Col span={15}>
-                                    {item.name}
-                                </Col>
+                                    <Col span={15}>
+                                        {item.name}
+                                    </Col>
 
-                                <Col span={4}>
-                                    {msToTime(item.duration_ms)}
-                                </Col>
+                                    <Col span={4}>
+                                        {msToTime(item.duration_ms)}
+                                    </Col>
 
-                                <Col span={3}>
-                                    <AudioControlButton size="small" disabled={!item.preview_url} audioId={item.id + "-audio"} src={item.preview_url} />
-                                </Col>
-                            </Row>
-                        </List.Item>
-                    )}
-                />
-            </Card>
-        </div>
+                                    <Col span={3}>
+                                        <AudioControlButton size="small" disabled={!item.preview_url} audioId={item.id + "-audio"} src={item.preview_url} />
+                                    </Col>
+                                </Row>
+                            </List.Item>
+                        )}
+                    />
+                </Card>
+            </Col>
+        </Row>
     )
 }
 
