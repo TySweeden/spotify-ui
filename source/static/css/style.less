@@ -147,6 +147,22 @@
   text-align: center !important;
 }
 
+.card-title, .card-description {
+  display: block;
+  text-align: left;
+}
+
+.card-title p, .card-description p {
+ margin: 0;
+}
+
+.card-title > p:first-child {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
 .artist-view-card 
 .ant-card-body 
 .ant-card-meta 
@@ -290,6 +306,28 @@
 }
 
 @media only screen and (min-width: 900px) {
+  .album-view-card .ant-card-body .ant-card-meta {
+    top: -200px;
+    left: 260px !important;
+  }
+
+  .album-view-card .ant-card-body {
+    box-shadow: none !important;
+  }
+
+  .album-view-card .ant-card-cover {
+    display: inline-flex;
+    max-width: 240px;
+    margin: 0 !important;
+  }
+
+  .album-view-card .ant-card-cover img {
+    margin: 16px;
+    box-shadow: 0px 10px 20px 10px #171717;
+    z-index: 1;
+    border-radius: 6px;
+  }
+
   .main-content-component {
     margin: 0 8px;
   }

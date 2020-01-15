@@ -4,6 +4,7 @@ import { gql } from "apollo-boost";
 import { useQuery, useLazyQuery } from "@apollo/react-hooks";
 import RequestedTracksContext from '../../contexts/requestedTracksContext';
 import _ from 'lodash';
+import moment from "moment";
 import { useRouter } from 'next/router'
 //import Link from 'next/link';
 //import Router from 'next/router'
@@ -182,6 +183,8 @@ function album() {
         }
     }
 
+    console.log(albumTracks)
+
     return (
         <Row gutter={16} layout="flex" justify="space-between" style={{ zIndex: 1 }}>
             <Col
@@ -206,15 +209,27 @@ function album() {
                 >
                     <Card.Meta
                         title={
+
                             getAlbum.data
-                                ? _.get(getAlbum.data.getAlbumById.data, "name")
-                                : null}
+                                ? <div className="card-title"> 
+                                    <p>{_.get(getAlbum.data.getAlbumById.data, "type")}</p>
+                                    <p>{_.get(getAlbum.data.getAlbumById.data, "name")}</p>
+                                </div>
+                                : null
+                        }
                         description={
                             getAlbum.data
-                                ? _.has(getAlbum.data.getAlbumById.data, "genres")
-                                    ? _.join(getAlbum.data.getAlbumById.data, " • ")
-                                    : null
-                                : null}
+                            ? <div className="card-description"> 
+                                <p>{"By " + _.join(_.map(getAlbum.data.getAlbumById.data.artists, "name"), " • ")}</p>
+                                <p>
+                                {
+                                    moment(_.get(getAlbum.data.getAlbumById.data, "release_date")).format("YYYY") 
+                                    + (_.values(albumTracks).length > 0 ? " • " + _.flatten(_.values(albumTracks)).length + " songs": "")
+                                }
+                                </p>
+                            </div>
+                            : null
+                        }
                     />
 
                     <List
