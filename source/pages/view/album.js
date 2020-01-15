@@ -249,8 +249,8 @@ function album() {
                                         sm={{ span: 15 }}
                                         md={{ span: 15 }}
                                         lg={{ span: 15 }}
-                                        xl={{ span: 8 }}
-                                        xxl={{ span: 8 }}
+                                        xl={{ span: 15 }}
+                                        xxl={{ span: 16 }}
                                     >
                                         {item.name}
                                     </Col>
@@ -259,9 +259,9 @@ function album() {
                                         xs={{ span: 4 }}
                                         sm={{ span: 4 }}
                                         md={{ span: 4 }}
-                                        lg={{ span: 4 }}
+                                        lg={{ span: 3 }}
                                         xl={{ span: 3 }}
-                                        xxl={{ span: 1 }}
+                                        xxl={{ span: 2 }}
                                     >
                                         {msToTime(item.duration_ms)}
                                     </Col>
@@ -270,8 +270,8 @@ function album() {
                                         xs={{ span: 3 }}
                                         sm={{ span: 3 }}
                                         md={{ span: 3 }}
-                                        lg={{ span: 1 }}
-                                        xl={{ span: 1 }}
+                                        lg={{ span: 2 }}
+                                        xl={{ span: 2 }}
                                         xxl={{ span: 1 }}
                                     >
                                         <AudioControlButton size="small" disabled={!item.preview_url} audioId={item.id + "-audio"} src={item.preview_url} />
