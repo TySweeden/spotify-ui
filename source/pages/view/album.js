@@ -59,6 +59,7 @@ function album() {
                     release_date_precision
                     total_tracks
                     type
+                    album_type
                     uri
                 }
             }
@@ -213,7 +214,7 @@ function album() {
                             getAlbum.data
                                 ? <div className="card-title"> 
                                     <p>{_.get(getAlbum.data.getAlbumById.data, "type")}</p>
-                                    <p>{_.get(getAlbum.data.getAlbumById.data, "name")}</p>
+                                    <p style={{fontSize : _.get(getAlbum.data.getAlbumById.data, "name").length > 10 ? "22px" : ""}}>{_.get(getAlbum.data.getAlbumById.data, "name")}</p>
                                 </div>
                                 : null
                         }
@@ -224,7 +225,10 @@ function album() {
                                 <p>
                                 {
                                     moment(_.get(getAlbum.data.getAlbumById.data, "release_date")).format("YYYY") 
-                                    + (_.values(albumTracks).length > 0 ? " • " + _.flatten(_.values(albumTracks)).length + " songs": "")
+                                    + 
+                                    (_.values(albumTracks).length === 0 
+                                        ? "" 
+                                        : " • " + _.flatten(_.values(albumTracks)).length + (_.get(getAlbum.data.getAlbumById.data, "album_type") === "single" ? " song" : " songs"))
                                 }
                                 </p>
                             </div>
