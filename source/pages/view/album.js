@@ -188,9 +188,9 @@ function album() {
                 xs={{ span: 24 }}
                 sm={{ span: 24 }}
                 md={{ span: 24 }}
-                lg={{ span: 14 }}
-                xl={{ span: 14 }}
-                xxl={{ span: 10 }}
+                lg={{ span: 24 }}
+                xl={{ span: 24 }}
+                xxl={{ span: 24 }}
             >
                 <Card
                     //loading={getAlbum.loading}
@@ -218,25 +218,62 @@ function album() {
                     />
 
                     <List
+                        grid={{
+                            gutter: 0,
+                            xs: 1,
+                            sm: 1,
+                            md: 2,
+                            lg: 2,
+                            xl: 2,
+                            xxl: 2
+                        }}
                         itemLayout="horizontal"
                         loading={getAlbumTracksVars.loading}
                         dataSource={albumTracks ? albumTracks[selectedAlbumId] : []}
                         renderItem={item => (
                             <List.Item key={item.id} id={item.id}>
                                 <Row gutter={2} justify="space-between" style={{ width: "100%" }}>
-                                    <Col span={2}>
+                                    <Col 
+                                        xs={{ span: 2 }}
+                                        sm={{ span: 2 }}
+                                        md={{ span: 2 }}
+                                        lg={{ span: 2 }}
+                                        xl={{ span: 1 }}
+                                        xxl={{ span: 1 }}
+                                    >
                                         <Checkbox value={item.id} onChange={handleSelectedTrack} defaultChecked={_.findIndex(requestedTracks, { "trackId": item.id }) >= 0} />
                                     </Col>
 
-                                    <Col span={15}>
+                                    <Col
+                                        xs={{ span: 15 }}
+                                        sm={{ span: 15 }}
+                                        md={{ span: 15 }}
+                                        lg={{ span: 15 }}
+                                        xl={{ span: 8 }}
+                                        xxl={{ span: 8 }}
+                                    >
                                         {item.name}
                                     </Col>
 
-                                    <Col span={4}>
+                                    <Col
+                                        xs={{ span: 4 }}
+                                        sm={{ span: 4 }}
+                                        md={{ span: 4 }}
+                                        lg={{ span: 4 }}
+                                        xl={{ span: 3 }}
+                                        xxl={{ span: 1 }}
+                                    >
                                         {msToTime(item.duration_ms)}
                                     </Col>
 
-                                    <Col span={3}>
+                                    <Col
+                                        xs={{ span: 3 }}
+                                        sm={{ span: 3 }}
+                                        md={{ span: 3 }}
+                                        lg={{ span: 1 }}
+                                        xl={{ span: 1 }}
+                                        xxl={{ span: 1 }}
+                                    >
                                         <AudioControlButton size="small" disabled={!item.preview_url} audioId={item.id + "-audio"} src={item.preview_url} />
                                     </Col>
                                 </Row>

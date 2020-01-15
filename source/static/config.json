@@ -1,4 +1,5 @@
 {
-  "graphqlEndpoint": "http://localhost:8081/v1/graphql",
-  "graphqlWsEndpoint": "ws://localhost:8081/v1/graphql"
+  "graphqlEndpoint": "http://13.86.59.245:8081/v1/graphql",
+  "graphqlWsEndpoint": "ws://13.86.59.245:8081/v1/graphql",
+  "husuraAccessToken": "JVqyQNbxXnszUvS2NP8Tb8y5"
 }

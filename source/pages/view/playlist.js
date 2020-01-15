@@ -181,9 +181,9 @@ function playlist() {
                 xs={{ span: 24 }}
                 sm={{ span: 24 }}
                 md={{ span: 24 }}
-                lg={{ span: 14 }}
-                xl={{ span: 14 }}
-                xxl={{ span: 10 }}
+                lg={{ span: 24 }}
+                xl={{ span: 24 }}
+                xxl={{ span: 24 }}
             >
                 <Card
                     className="album-view-card"
@@ -230,12 +230,30 @@ function playlist() {
                                                 />
                                             </div>
                                         </List.Item>}>
-                                    <List itemLayout="horizontal" split={false}>
+                                    <List
+                                        grid={{
+                                            gutter: 0,
+                                            xs: 1,
+                                            sm: 1,
+                                            md: 1,
+                                            lg: 1,
+                                            xxl: 1
+                                        }}
+                                        itemLayout="horizontal"
+                                        split={false}
+                                    >
                                         {_.map(albumTracks ? albumTracks[item.id] : [], item =>
                                             // inline map fixes issue with sub-elements not being removed upon removal from albumTracks state
                                             <List.Item key={item.id}>
                                                 <Row gutter={2} justify="space-between" style={{ width: "100%" }}>
-                                                    <Col span={2}>
+                                                    <Col
+                                                        xs={{ span: 2 }}
+                                                        sm={{ span: 2 }}
+                                                        md={{ span: 2 }}
+                                                        lg={{ span: 2 }}
+                                                        xl={{ span: 1 }}
+                                                        xxl={{ span: 1 }}
+                                                    >
                                                         <Checkbox
                                                             value={item.id}
                                                             onChange={handleSelectedTrack}
@@ -245,15 +263,37 @@ function playlist() {
                                                         />
                                                     </Col>
 
-                                                    <Col span={15}>
+                                                    <Col
+                                                        xs={{ span: 15 }}
+                                                        sm={{ span: 15 }}
+                                                        md={{ span: 15 }}
+                                                        lg={{ span: 15 }}
+                                                        xl={{ span: 5 }}
+                                                        xxl={{ span: 5 }}
+                                                    >
                                                         {item.name}
                                                     </Col>
 
-                                                    <Col span={4} style={{ paddingLeft: 4 }}>
+                                                    <Col
+                                                        xs={{ span: 4 }}
+                                                        sm={{ span: 4 }}
+                                                        md={{ span: 4 }}
+                                                        lg={{ span: 4 }}
+                                                        xl={{ span: 3 }}
+                                                        xxl={{ span: 1 }}
+                                                        style={{ paddingLeft: 4 }}
+                                                    >
                                                         {msToTime(item.duration_ms)}
                                                     </Col>
 
-                                                    <Col span={3}>
+                                                    <Col
+                                                        xs={{ span: 3 }}
+                                                        sm={{ span: 3 }}
+                                                        md={{ span: 3 }}
+                                                        lg={{ span: 1 }}
+                                                        xl={{ span: 1 }}
+                                                        xxl={{ span: 1 }}
+                                                    >
                                                         <AudioControlButton size="small" disabled={!item.preview_url} audioId={item.id + "-audio"} src={item.preview_url} />
                                                     </Col>
                                                 </Row>

@@ -96,7 +96,8 @@ function InitApp(props) {
             uri: configuration.graphqlEndpoint, // use https for secure endpoint
             headers: {
                 authorization: token ? `Bearer ${token}` : '',
-                'access-token': token ? `${token}` : ''
+                'access-token': token ? `${token}` : '',
+                'x-hasura-admin-secret': configuration.husuraAccessToken
             }
         });
 
@@ -108,7 +109,8 @@ function InitApp(props) {
                 connectionParams: {
                     headers: {
                         authorization: token ? `Bearer ${token}` : '',
-                        'access-token': token ? `${token}` : ''
+                        'access-token': token ? `${token}` : '',
+                        'x-hasura-admin-secret': configuration.husuraAccessToken
                     }
                 }
             }

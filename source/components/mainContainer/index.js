@@ -260,7 +260,7 @@ function MainContainer(props) {
     !_.includes(router.pathname, "/search") ? router.push('/search') : null
 
     setSearchValue(e.target.value);
-    e.target.value ? searchAll({ variables: { limit: 5, name: e.target.value } }) : null
+    e.target.value ? searchAll({ variables: { limit: 6, name: e.target.value } }) : null
   }
 
   return (

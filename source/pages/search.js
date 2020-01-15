@@ -33,12 +33,21 @@ function search() {
                 xs={{ span: 24 }}
                 sm={{ span: 24 }}
                 md={{ span: 24 }}
-                lg={{ span: 14 }}
-                xl={{ span: 14 }}
-                xxl={{ span: 10 }}
+                lg={{ span: 15 }}
+                xl={{ span: 16 }}
+                xxl={{ span: 18 }}
             >
                 <Card size="large" bordered={false} className="search-result-card">
                     <List
+                        grid={{
+                            gutter: 4,
+                            xs: 1,
+                            sm: 1,
+                            md: 2,
+                            lg: 2,
+                            xl: 3,
+                            xxl: 4
+                        }}
                         loading={loading}
                         itemLayout="horizontal"
                         dataSource={searchResultContext.artists.data && searchResultContext.albums.data && searchResultContext.tracks.data
@@ -88,8 +97,8 @@ function search() {
                 xs={{ span: 24 }}
                 sm={{ span: 24 }}
                 md={{ span: 24 }}
-                lg={{ span: 10 }}
-                xl={{ span: 10 }}
+                lg={{ span: 5 }}
+                xl={{ span: 5 }}
                 xxl={{ span: 5 }}
             >
                 <Card size="large" bordered={false}>

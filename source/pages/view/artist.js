@@ -219,9 +219,9 @@ function artist() {
                 xs={{ span: 24 }}
                 sm={{ span: 24 }}
                 md={{ span: 24 }}
-                lg={{ span: 14 }}
-                xl={{ span: 14 }}
-                xxl={{ span: 10 }}
+                lg={{ span: 24 }}
+                xl={{ span: 24 }}
+                xxl={{ span: 24 }}
             >
                 <Card
                     //loading={getArtist.loading}
@@ -275,25 +275,62 @@ function artist() {
                                             </div>
                                         </List.Item>}>
                                     <List
+                                        grid={{
+                                            gutter: 0,
+                                            xs: 1,
+                                            sm: 1,
+                                            md: 1,
+                                            lg: 2,
+                                            xl: 2,
+                                            xxl: 2
+                                        }}
                                         itemLayout="horizontal"
                                         loading={getAlbumTracksVars.loading || localLoading}
                                         dataSource={albumTracks ? albumTracks[item.id] : []}
                                         renderItem={track =>
                                             <List.Item key={track.id}>
                                                 <Row gutter={2} justify="space-between" style={{ width: "100%" }}>
-                                                    <Col span={2}>
+                                                    <Col
+                                                        xs={{ span: 2 }}
+                                                        sm={{ span: 2 }}
+                                                        md={{ span: 2 }}
+                                                        lg={{ span: 2 }}
+                                                        xl={{ span: 1 }}
+                                                        xxl={{ span: 1 }}
+                                                    >
                                                         <Checkbox value={track.id} onChange={handleSelectedTrack} defaultChecked={_.findIndex(requestedTracks, { "trackId": track.id }) >= 0} />
                                                     </Col>
 
-                                                    <Col span={15}>
+                                                    <Col
+                                                        xs={{ span: 15 }}
+                                                        sm={{ span: 15 }}
+                                                        md={{ span: 15 }}
+                                                        lg={{ span: 15 }}
+                                                        xl={{ span: 15 }}
+                                                        xxl={{ span: 16 }}
+                                                    >
                                                         {track.name}
                                                     </Col>
 
-                                                    <Col span={4}>
+                                                    <Col
+                                                        xs={{ span: 4 }}
+                                                        sm={{ span: 4 }}
+                                                        md={{ span: 4 }}
+                                                        lg={{ span: 3 }}
+                                                        xl={{ span: 3 }}
+                                                        xxl={{ span: 2 }}
+                                                    >
                                                         {msToTime(track.duration_ms)}
                                                     </Col>
 
-                                                    <Col span={3}>
+                                                    <Col
+                                                        xs={{ span: 3 }}
+                                                        sm={{ span: 3 }}
+                                                        md={{ span: 2 }}
+                                                        lg={{ span: 2 }}
+                                                        xl={{ span: 2 }}
+                                                        xxl={{ span: 1 }}
+                                                    >
                                                         <AudioControlButton size="small" disabled={!track.preview_url} audioId={track.id + "-audio"} src={track.preview_url} />
                                                     </Col>
                                                 </Row>
