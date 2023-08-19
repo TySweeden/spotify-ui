@@ -38,7 +38,8 @@
     "react-apollo": "^3.0.0",
     "react-dom": "^16.8.6",
     "subscriptions-transport-ws": "^0.9.16",
-    "url-loader": "^3.0.0"
+    "url-loader": "^3.0.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "eslint-plugin-react-hooks": "^2.0.1",
